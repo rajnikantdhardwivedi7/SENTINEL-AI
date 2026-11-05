@@ -100,7 +100,7 @@ const sevTone: Record<string, string> = {
   sev4: "text-muted-foreground border-border bg-muted",
 };
 export function SeverityBadge({ severity }: { severity: string }) {
-  return <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase ${sevTone[severity] ?? sevTone.sev4}`}>{severity}</span>;
+  return <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase ${sevTone[severity] ?? sevTone["sev4"]}`}>{severity}</span>;
 }
 
 export function StatusPill({ status }: { status: string }) {

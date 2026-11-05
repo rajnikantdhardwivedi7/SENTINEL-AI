@@ -23,7 +23,7 @@ export function generateCpuSpike(opts: {
   seed: number;
   currentVersion: string;
   previousVersion: string;
-  cause?: SpikeCause;
+  cause?: SpikeCause | undefined;
 }): CpuSpikeScenario {
   const r = seeded(opts.seed);
   const cause: SpikeCause = opts.cause ?? (r() < 0.5 ? "bad_deploy" : "traffic_surge");
