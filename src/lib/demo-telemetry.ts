@@ -67,7 +67,7 @@ const activityPool = [
 export type Activity = { id: number; agent: string; msg: string; at: string };
 
 export function activityAt(i: number): Activity {
-  const a = activityPool[i % activityPool.length];
+  const a = activityPool[i % activityPool.length]!;
   const d = new Date(Date.UTC(2026, 0, 1) + i * 37_000);
   return { id: i, ...a, at: d.toISOString().slice(11, 19) };
 }

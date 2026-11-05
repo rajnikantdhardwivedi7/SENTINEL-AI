@@ -41,7 +41,7 @@ function Dashboard() {
     return () => clearInterval(id);
   }, []);
   const data = metricWindow(tick);
-  const now = data[data.length - 1];
+  const now = data[data.length - 1]!;
   const score = healthScore(now);
   const feed: Activity[] = Array.from({ length: 8 }, (_, k) => activityAt(tick - k));
 
