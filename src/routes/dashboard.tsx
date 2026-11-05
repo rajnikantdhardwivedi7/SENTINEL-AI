@@ -233,7 +233,7 @@ type Overview = Awaited<ReturnType<typeof getOverview>>;
 
 function IncidentTable({ session, loading, data }: { session: boolean; loading: boolean; data?: Overview | undefined }) {
   const rows = session && data
-    ? data.recentIncidents.map((i) => ({ id: i.id, ref: i.reference, title: i.title, severity: i.severity, service: i.services?.name ?? "—", detected: new Date(i.detected_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), status: i.status, agent: i.assignee_id ? "Assigned" : "—", link: true }))
+    ? data.recentIncidents.filter((i) => i.source !== "real").map((i) => ({ id: i.id, ref: i.reference, title: i.title, severity: i.severity, service: i.services?.name ?? "—", detected: new Date(i.detected_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), status: i.status, agent: i.assignee_id ? "Assigned" : "—", link: true }))
     : demoIncidents.map((i) => ({ id: i.ref, ref: i.ref, title: i.title, severity: i.severity, service: i.service, detected: i.detected, status: i.status, agent: i.agent, link: false }));
   if (loading) return <div className="space-y-2 p-4">{[0, 1, 2].map((k) => <Skeleton key={k} className="h-7 w-full" />)}</div>;
   if (session && rows.length === 0) return <EmptyState title="No incidents yet"><Link to="/simulation" className="text-primary hover:underline">Run a simulation</Link> to create one.</EmptyState>;
