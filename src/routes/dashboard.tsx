@@ -36,6 +36,8 @@ const axis = { stroke: "var(--muted-foreground)", fontSize: 10, tickLine: false,
 
 function Dashboard() {
   const [tick, setTick] = useState(200);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 2000);
     return () => clearInterval(id);
@@ -87,7 +89,7 @@ function Dashboard() {
 
             <div className="grid gap-4 xl:grid-cols-3">
               <Panel title="CPU & memory utilization" sub="% across all clusters" className="xl:col-span-2">
-                <ResponsiveContainer width="100%" height={220}>
+                {mounted && <ResponsiveContainer width="100%" height={220}>
                   <AreaChart data={data}>
                     <defs>
                       <linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.35} /><stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} /></linearGradient>
@@ -97,10 +99,9 @@ function Dashboard() {
                     <YAxis {...axis} domain={[0, 100]} width={28} />
                     <Tooltip contentStyle={tooltipStyle} />
                     <Area type="monotone" dataKey="cpu" stroke="var(--chart-1)" fill="url(#gc)" strokeWidth={1.5} isAnimationActive={false} />
-                    <Line type="monotone" dataKey="mem" stroke="var(--chart-2)" dot={false} strokeWidth={1.5} isAnimationActive={false} />
                     <Area type="monotone" dataKey="mem" stroke="var(--chart-2)" fill="transparent" strokeWidth={1.5} isAnimationActive={false} />
                   </AreaChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer>}
               </Panel>
               <Panel title="Agent activity" sub="real-time feed">
                 <ul className="space-y-2.5 text-xs">
@@ -116,7 +117,7 @@ function Dashboard() {
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <Panel title="Request latency" sub="p95, ms">
-                <ResponsiveContainer width="100%" height={160}>
+                {mounted && <ResponsiveContainer width="100%" height={160}>
                   <LineChart data={data}>
                     <CartesianGrid stroke="var(--border)" vertical={false} />
                     <XAxis dataKey="t" {...axis} interval={9} />
@@ -124,10 +125,10 @@ function Dashboard() {
                     <Tooltip contentStyle={tooltipStyle} />
                     <Line type="monotone" dataKey="p95" stroke="var(--chart-4)" dot={false} strokeWidth={1.5} isAnimationActive={false} />
                   </LineChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer>}
               </Panel>
               <Panel title="Error rate" sub="% of requests">
-                <ResponsiveContainer width="100%" height={160}>
+                {mounted && <ResponsiveContainer width="100%" height={160}>
                   <AreaChart data={data}>
                     <CartesianGrid stroke="var(--border)" vertical={false} />
                     <XAxis dataKey="t" {...axis} interval={9} />
@@ -135,10 +136,10 @@ function Dashboard() {
                     <Tooltip contentStyle={tooltipStyle} />
                     <Area type="monotone" dataKey="errors" stroke="var(--chart-5)" fill="var(--chart-5)" fillOpacity={0.15} strokeWidth={1.5} isAnimationActive={false} />
                   </AreaChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer>}
               </Panel>
               <Panel title="Incident trend" sub="last 7 days, by severity">
-                <ResponsiveContainer width="100%" height={160}>
+                {mounted && <ResponsiveContainer width="100%" height={160}>
                   <BarChart data={incidentTrend}>
                     <CartesianGrid stroke="var(--border)" vertical={false} />
                     <XAxis dataKey="day" {...axis} />
@@ -148,7 +149,7 @@ function Dashboard() {
                     <Bar dataKey="sev2" stackId="a" fill="var(--chart-4)" />
                     <Bar dataKey="sev1" stackId="a" fill="var(--chart-5)" />
                   </BarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer>}
               </Panel>
             </div>
 
