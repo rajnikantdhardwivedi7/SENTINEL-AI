@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { AppShell, SeverityBadge, SourceTag, StatusPill } from "@/components/sentinel/AppShell";
 import { listIncidents } from "@/lib/sentinel.functions";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/incidents/")({
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/incidents/")({
 
 const STATUSES = ["all", "open", "investigating", "awaiting_approval", "remediating", "monitoring", "resolved", "closed"];
 const SEVERITIES = ["all", "sev1", "sev2", "sev3", "sev4"];
-const selectCls = "h-9 rounded-md border bg-background px-2 text-sm";
+const selectCls = "h-9 rounded-md border bg-surface px-2 text-[13px] transition-colors hover:bg-accent";
 
 function IncidentsPage() {
   const [q, setQ] = useState("");
@@ -37,7 +38,7 @@ function IncidentsPage() {
   });
 
   return (
-    <AppShell title="Incidents" actions={<Link to="/simulation" className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">Simulate incident</Link>}>
+    <AppShell title="Incidents" subtitle="Search, triage and follow every incident in your organization." actions={<Button asChild size="sm"><Link to="/simulation">Simulate incident</Link></Button>}>
       <div className="space-y-4 p-4 md:p-6">
         <div className="flex flex-wrap gap-2">
           <div className="relative min-w-48 flex-1">
@@ -52,10 +53,10 @@ function IncidentsPage() {
           </select>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-surface/60 text-left text-xs text-muted-foreground">
-              <tr><th className="p-3 font-normal">Incident</th><th className="p-3 font-normal">Service</th><th className="p-3 font-normal">Severity</th><th className="p-3 font-normal">Status</th><th className="p-3 font-normal">Source</th><th className="p-3 font-normal">Detected</th></tr>
+        <div className="overflow-x-auto rounded-lg border bg-surface">
+          <table className="w-full text-[13px]">
+            <thead className="border-b text-left text-[11px] uppercase tracking-wide text-subtle-foreground">
+              <tr><th className="px-4 py-2.5 font-medium">Incident</th><th className="px-4 py-2.5 font-medium">Service</th><th className="px-4 py-2.5 font-medium">Severity</th><th className="px-4 py-2.5 font-medium">Status</th><th className="px-4 py-2.5 font-medium">Source</th><th className="px-4 py-2.5 font-medium">Detected</th></tr>
             </thead>
             <tbody>
               {isLoading && Array.from({ length: 4 }, (_, i) => <tr key={i} className="border-t"><td colSpan={6} className="p-3"><Skeleton className="h-5 w-full" /></td></tr>)}
@@ -64,7 +65,7 @@ function IncidentsPage() {
                 <tr><td colSpan={6} className="p-10 text-center text-muted-foreground">No incidents match. <Link to="/simulation" className="text-primary underline">Run a simulation</Link> to create one.</td></tr>
               )}
               {data?.incidents.map((i) => (
-                <tr key={i.id} className="border-t hover:bg-accent/40">
+                <tr key={i.id} className="border-t transition-colors hover:bg-accent/40">
                   <td className="p-3"><Link to="/incidents/$incidentId" params={{ incidentId: i.id }} className="block"><span className="font-mono text-xs text-muted-foreground">{i.reference}</span><span className="block font-medium">{i.title}</span></Link></td>
                   <td className="p-3 font-mono text-xs">{i.services?.name ?? "—"}</td>
                   <td className="p-3"><SeverityBadge severity={i.severity} /></td>

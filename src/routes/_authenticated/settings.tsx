@@ -60,7 +60,7 @@ function SettingsPage() {
   const manageMembers = can(role, "members.manage");
 
   return (
-    <AppShell title="Settings">
+    <AppShell title="Settings" subtitle="Profile, organization, workspaces and team roles.">
       <div className="grid gap-4 p-4 md:p-6 xl:grid-cols-2">
         <Panel title="Your profile" sub={ROLE_LABELS[role]}>
           <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); profM.mutate(); }}>
@@ -78,7 +78,7 @@ function SettingsPage() {
             {me.data.organization.join_code && (
               <div className="rounded-md border p-3 text-sm">
                 <div className="text-xs text-muted-foreground">Invite code — teammates enter this when creating an account and join as Viewers.</div>
-                <div className="mt-1 font-mono text-lg tracking-widest text-primary">{me.data.organization.join_code}</div>
+                <div className="mt-1 font-mono text-lg tracking-widest text-foreground">{me.data.organization.join_code}</div>
               </div>
             )}
           </form>
