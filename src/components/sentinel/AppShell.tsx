@@ -29,7 +29,7 @@ const bottom: NavItem[] = [{ icon: BookOpen, label: "Documentation" }, { icon: S
 function NavLink({ item, collapsed, onNavigate }: { item: NavItem; collapsed: boolean; onNavigate?: () => void }) {
   const base = "group flex h-8 items-center gap-2.5 rounded-md px-2 text-[13px] transition-colors";
   const inner = item.to ? (
-    <Link to={item.to} onClick={onNavigate} className={cn(base, "text-muted-foreground hover:bg-accent hover:text-foreground", collapsed && "justify-center px-0")}
+    <Link to={item.to} onClick={onNavigate} aria-label={item.label} className={cn(base, "text-muted-foreground hover:bg-accent hover:text-foreground", collapsed && "justify-center px-0")}
       activeProps={{ className: "bg-accent !text-foreground shadow-[inset_2px_0_0_var(--primary)]" }}>
       <item.icon className="size-4 shrink-0" strokeWidth={1.75} />{!collapsed && <span className="truncate">{item.label}</span>}
     </Link>
