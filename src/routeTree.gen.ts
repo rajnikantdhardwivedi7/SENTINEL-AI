@@ -10,11 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSimulationRouteImport } from './routes/_authenticated/simulation'
+import { Route as AuthenticatedIncidentsIndexRouteImport } from './routes/_authenticated/incidents.index'
+import { Route as AuthenticatedIncidentsIncidentIdRouteImport } from './routes/_authenticated/incidents.$incidentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -22,31 +38,106 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSimulationRoute = AuthenticatedSimulationRouteImport.update({
+  id: '/simulation',
+  path: '/simulation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIncidentsIndexRoute =
+  AuthenticatedIncidentsIndexRouteImport.update({
+    id: '/incidents/',
+    path: '/incidents/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIncidentsIncidentIdRoute =
+  AuthenticatedIncidentsIncidentIdRouteImport.update({
+    id: '/incidents/$incidentId',
+    path: '/incidents/$incidentId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/simulation': typeof AuthenticatedSimulationRoute
+  '/incidents/$incidentId': typeof AuthenticatedIncidentsIncidentIdRoute
+  '/incidents/': typeof AuthenticatedIncidentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/simulation': typeof AuthenticatedSimulationRoute
+  '/incidents/$incidentId': typeof AuthenticatedIncidentsIncidentIdRoute
+  '/incidents': typeof AuthenticatedIncidentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/simulation': typeof AuthenticatedSimulationRoute
+  '/_authenticated/incidents/$incidentId': typeof AuthenticatedIncidentsIncidentIdRoute
+  '/_authenticated/incidents/': typeof AuthenticatedIncidentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/reset-password'
+    | '/settings'
+    | '/simulation'
+    | '/incidents/$incidentId'
+    | '/incidents/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard'
-  id: '__root__' | '/' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/reset-password'
+    | '/settings'
+    | '/simulation'
+    | '/incidents/$incidentId'
+    | '/incidents'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/dashboard'
+    | '/reset-password'
+    | '/_authenticated/settings'
+    | '/_authenticated/simulation'
+    | '/_authenticated/incidents/$incidentId'
+    | '/_authenticated/incidents/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +149,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -65,12 +170,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/simulation': {
+      id: '/_authenticated/simulation'
+      path: '/simulation'
+      fullPath: '/simulation'
+      preLoaderRoute: typeof AuthenticatedSimulationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/incidents/': {
+      id: '/_authenticated/incidents/'
+      path: '/incidents'
+      fullPath: '/incidents/'
+      preLoaderRoute: typeof AuthenticatedIncidentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/incidents/$incidentId': {
+      id: '/_authenticated/incidents/$incidentId'
+      path: '/incidents/$incidentId'
+      fullPath: '/incidents/$incidentId'
+      preLoaderRoute: typeof AuthenticatedIncidentsIncidentIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSimulationRoute: typeof AuthenticatedSimulationRoute
+  AuthenticatedIncidentsIncidentIdRoute: typeof AuthenticatedIncidentsIncidentIdRoute
+  AuthenticatedIncidentsIndexRoute: typeof AuthenticatedIncidentsIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSimulationRoute: AuthenticatedSimulationRoute,
+  AuthenticatedIncidentsIncidentIdRoute: AuthenticatedIncidentsIncidentIdRoute,
+  AuthenticatedIncidentsIndexRoute: AuthenticatedIncidentsIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

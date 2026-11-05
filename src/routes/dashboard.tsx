@@ -1,8 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Bell, Boxes, ChevronDown, Cpu, LayoutDashboard, Server, ShieldAlert, Siren, Brain, Wrench, FlaskConical, BarChart3, Settings } from "lucide-react";
-import { Logo, DemoBanner } from "@/components/sentinel/Logo";
+import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Boxes, Cpu } from "lucide-react";
+import { AppShell, Panel, SeverityBadge, SourceTag, StatusPill } from "@/components/sentinel/AppShell";
+import { useSession } from "@/hooks/use-session";
+import { getOverview } from "@/lib/sentinel.functions";
+import { DemoBanner } from "@/components/sentinel/Logo";
 import { activityAt, clusters, healthScore, incidentTrend, metricWindow, services, type Activity } from "@/lib/demo-telemetry";
 
 export const Route = createFileRoute("/dashboard")({
@@ -19,17 +25,6 @@ export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
-const nav = [
-  { icon: LayoutDashboard, label: "Command Center", active: true },
-  { icon: Server, label: "Infrastructure" },
-  { icon: Brain, label: "Investigations" },
-  { icon: ShieldAlert, label: "Security" },
-  { icon: Siren, label: "Incidents" },
-  { icon: Wrench, label: "Remediation" },
-  { icon: FlaskConical, label: "Simulation Lab" },
-  { icon: BarChart3, label: "Analytics" },
-  { icon: Settings, label: "Settings" },
-];
 
 const tooltipStyle = { background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12 };
 const axis = { stroke: "var(--muted-foreground)", fontSize: 10, tickLine: false, axisLine: false };
@@ -45,42 +40,21 @@ function Dashboard() {
   const data = metricWindow(tick);
   const now = data[data.length - 1]!;
   const score = healthScore(now);
+  const { session } = useSession();
+  const fetchOverview = useServerFn(getOverview);
+  const overview = useQuery({ queryKey: ["overview"], queryFn: () => fetchOverview(), enabled: !!session, refetchInterval: 10_000 });
   const feed: Activity[] = Array.from({ length: 8 }, (_, k) => activityAt(tick - k));
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <DemoBanner />
-      <div className="flex flex-1">
-        <aside className="hidden w-56 shrink-0 flex-col border-r bg-surface/40 p-3 lg:flex">
-          <div className="px-2 py-2"><Logo /></div>
-          <button className="mt-4 flex items-center justify-between rounded-md border px-3 py-2 text-left text-sm">
-            <span><span className="block text-xs text-muted-foreground">Workspace</span>Acme Platform</span>
-            <ChevronDown className="size-4 text-muted-foreground" />
-          </button>
-          <nav className="mt-4 space-y-0.5">
-            {nav.map((n) => (
-              <div key={n.label} className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm ${n.active ? "bg-accent text-foreground" : "text-muted-foreground"}`}>
-                <n.icon className="size-4" />{n.label}
-                {!n.active && <span className="ml-auto font-mono text-[10px] opacity-60">soon</span>}
-              </div>
-            ))}
-          </nav>
-        </aside>
-
-        <main className="min-w-0 flex-1">
-          <header className="flex h-14 items-center justify-between border-b px-4 md:px-6">
-            <div className="lg:hidden"><Logo /></div>
-            <h1 className="hidden text-sm font-medium lg:block">Command Center</h1>
-            <div className="flex items-center gap-3">
-              <span className="hidden items-center gap-1.5 font-mono text-xs text-muted-foreground sm:flex"><span className="size-1.5 rounded-full bg-success pulse-dot" />live · simulated</span>
-              <button aria-label="Notifications" className="relative rounded-md border p-2"><Bell className="size-4" /><span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-destructive text-[10px] text-destructive-foreground">3</span></button>
-            </div>
-          </header>
-
+    <AppShell
+      title="Command Center"
+      banner={<DemoBanner />}
+      actions={<span className="hidden items-center gap-1.5 font-mono text-xs text-muted-foreground sm:flex"><span className="size-1.5 rounded-full bg-success pulse-dot" />live · simulated</span>}
+    >
           <div className="space-y-4 p-4 md:p-6">
             <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-4 xl:grid-cols-6">
               <Stat label="Health score" value={`${score}`} tone={score > 80 ? "text-success" : "text-warning"} />
-              <Stat label="Active incidents" value="2" tone="text-warning" />
+              <Stat label={overview.data ? "Active incidents · saved" : "Active incidents"} value={`${overview.data?.activeIncidents ?? 2}`} tone="text-warning" />
               <Stat label="Critical alerts" value="1" tone="text-destructive" />
               <Stat label="Services" value={`${services.length}`} />
               <Stat label="CPU" value={`${now.cpu}%`} />
@@ -185,10 +159,9 @@ function Dashboard() {
                 </ul>
               </Panel>
             </div>
+            <PersistedPanel session={!!session} loading={overview.isLoading} data={overview.data} />
           </div>
-        </main>
-      </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -201,16 +174,45 @@ function Stat({ label, value, tone = "text-foreground" }: { label: string; value
   );
 }
 
-function Panel({ title, sub, className = "", children }: { title: string; sub?: string; className?: string; children: React.ReactNode }) {
-  return (
-    <section className={`rounded-lg border bg-surface/40 p-4 ${className}`}>
-      <div className="mb-3 flex items-baseline justify-between"><h2 className="text-sm font-medium">{title}</h2>{sub && <span className="text-xs text-muted-foreground">{sub}</span>}</div>
-      {children}
-    </section>
-  );
-}
-
 function StatusBadge({ status }: { status: string }) {
   const tone = status === "healthy" ? "text-success border-success/30 bg-success/10" : status === "degraded" ? "text-destructive border-destructive/30 bg-destructive/10" : "text-warning border-warning/30 bg-warning/10";
   return <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase ${tone}`}>{status}</span>;
+}
+
+type Overview = Awaited<ReturnType<typeof getOverview>>;
+
+function PersistedPanel({ session, loading, data }: { session: boolean; loading: boolean; data?: Overview | undefined }) {
+  if (!session) {
+    return (
+      <Panel title="Your organization" sub="saved incidents">
+        <p className="text-sm text-muted-foreground">Everything above is simulated. <Link to="/auth" className="text-primary underline">Sign in</Link> to see your saved incidents and run the full incident lifecycle.</p>
+      </Panel>
+    );
+  }
+  return (
+    <div className="grid gap-4 xl:grid-cols-3">
+      <Panel title="Recent incidents" sub={<Link to="/incidents" className="text-primary">View all</Link>} className="xl:col-span-2">
+        {loading ? <p className="text-sm text-muted-foreground">Loading…</p> : !data?.recentIncidents.length ? (
+          <p className="text-sm text-muted-foreground">No incidents yet. <Link to="/simulation" className="text-primary underline">Run a simulation</Link>.</p>
+        ) : (
+          <ul className="divide-y">
+            {data.recentIncidents.map((i) => (
+              <li key={i.id}><Link to="/incidents/$incidentId" params={{ incidentId: i.id }} className="flex items-center gap-3 py-2 text-sm hover:text-primary">
+                <SeverityBadge severity={i.severity} /><span className="min-w-0 flex-1 truncate">{i.title}</span><SourceTag kind={i.source === "real" ? "real" : "simulated"} /><StatusPill status={i.status} />
+              </Link></li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+      <Panel title="Audit trail" sub={<SourceTag kind="ai" />}>
+        {!data?.activity.length ? <p className="text-sm text-muted-foreground">No activity recorded yet.</p> : (
+          <ul className="space-y-2 text-xs">
+            {data.activity.map((a) => (
+              <li key={a.id} className="flex gap-2"><span className="w-14 shrink-0 font-mono text-muted-foreground">{new Date(a.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span><span><span className="font-medium text-primary">{a.actor_type === "agent" ? a.agent : a.actor_type === "system" ? "System" : "You/team"}</span> <span className="text-muted-foreground">{a.message}</span></span></li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+    </div>
+  );
 }
