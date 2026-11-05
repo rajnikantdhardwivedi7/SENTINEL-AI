@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Eye, GitBranch, ShieldCheck, Workflow } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/sentinel/Logo";
-import screenshot from "@/assets/command-center.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,6 +40,7 @@ const governance = [
 ];
 
 const integrations = ["Kubernetes", "Prometheus", "OpenTelemetry", "Falco", "AWS", "PagerDuty"];
+const commandCenterScreenshot = "https://raw.githubusercontent.com/rajnikantdhardwivedi7/SENTINEL-AI/main/docs/assets/screenshots/command-center.png";
 
 function Landing() {
   return (
@@ -81,7 +81,7 @@ function Landing() {
               <span className="size-2.5 rounded-full bg-elevated" /><span className="size-2.5 rounded-full bg-elevated" /><span className="size-2.5 rounded-full bg-elevated" />
               <span className="ml-3 text-[11px] text-subtle-foreground">Command Center · simulated data</span>
             </div>
-            <img src={screenshot.url} alt="SENTINEL Command Center showing health KPIs, utilization charts, incidents and agent activity" className="block w-full" loading="eager" />
+            <img src={commandCenterScreenshot} alt="SENTINEL Command Center showing health KPIs, utilization charts, incidents and agent activity" className="block w-full" loading="eager" />
           </div>
         </div>
       </section>
@@ -174,7 +174,7 @@ function Landing() {
       <footer className="border-t">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 text-xs text-subtle-foreground">
           <Logo />
-          <span>Demo environment · simulated telemetry</span>
+          <div className="flex flex-wrap items-center justify-end gap-4"><a href="https://rajnikantdhardwivedi.in/blog/building-sentinel-ai/" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Engineering blog <ArrowRight className="ml-1 inline size-3" /></a><a href="https://github.com/rajnikantdhardwivedi7/SENTINEL-AI" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">GitHub</a><span>Demo environment · simulated telemetry</span></div>
         </div>
       </footer>
     </div>
