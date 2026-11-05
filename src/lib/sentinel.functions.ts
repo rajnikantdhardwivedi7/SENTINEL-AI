@@ -26,7 +26,7 @@ async function getActor(supabase: DB, userId: string) {
   return { userId, role: data.role as Role, orgId: data.organization_id };
 }
 
-function require(role: Role, permission: Permission) {
+function requirePerm(role: Role, permission: Permission) {
   if (!can(role, permission)) throw new Error(`Forbidden: your role cannot perform ${permission}`);
 }
 
@@ -122,7 +122,7 @@ export const updateMemberRole = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const actor = await getActor(context.supabase, context.userId);
-    require(actor.role, "members.manage");
+    requirePerm(actor.role, "members.manage");
     if (data.userId === actor.userId && data.role !== "admin") {
       const { count } = await context.supabase
         .from("user_roles")
@@ -147,7 +147,7 @@ export const updateOrganization = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ name: z.string().trim().min(1).max(120) }).parse(d))
   .handler(async ({ data, context }) => {
     const actor = await getActor(context.supabase, context.userId);
-    require(actor.role, "workspace.manage");
+    requirePerm(actor.role, "workspace.manage");
     const { error } = await context.supabase.from("organizations").update({ name: data.name }).eq("id", actor.orgId);
     if (error) throw new Error("Failed to rename organization");
     return { ok: true };
@@ -162,7 +162,7 @@ export const createWorkspace = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const actor = await getActor(context.supabase, context.userId);
-    require(actor.role, "workspace.manage");
+    requirePerm(actor.role, "workspace.manage");
     const { error } = await context.supabase
       .from("workspaces")
       .insert({ organization_id: actor.orgId, name: data.name, environment: data.environment });
@@ -294,7 +294,7 @@ export const updateIncident = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const actor = await getActor(context.supabase, context.userId);
-    require(actor.role, "incident.update");
+    requirePerm(actor.role, "incident.update");
     const patch: Database["public"]["Tables"]["incidents"]["Update"] = {};
     const changes: string[] = [];
     if (data.status) {
@@ -331,7 +331,7 @@ export const runCpuSpikeSimulation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const actor = await getActor(supabase, context.userId);
-    require(actor.role, "simulation.run");
+    requirePerm(actor.role, "simulation.run");
 
     let svcQuery = supabase.from("services").select("*").limit(1);
     svcQuery = data.serviceId ? svcQuery.eq("id", data.serviceId) : svcQuery.eq("name", "checkout-svc");
@@ -405,7 +405,7 @@ export const startInvestigation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const actor = await getActor(supabase, context.userId);
-    require(actor.role, "investigation.run");
+    requirePerm(actor.role, "investigation.run");
 
     const incident = check(
       await supabase.from("incidents").select("*, services(*)").eq("id", data.incidentId).maybeSingle(),
@@ -509,7 +509,7 @@ export const decideRemediation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const actor = await getActor(supabase, context.userId);
-    require(actor.role, "remediation.approve");
+    requirePerm(actor.role, "remediation.approve");
     const plan = check(await supabase.from("remediation_plans").select("id, incident_id, status, title").eq("id", data.planId).maybeSingle(), "load plan");
     if (plan.status !== "pending_approval") throw new Error("This plan is no longer awaiting approval");
     const ins = await supabase.from("remediation_approvals").insert({
@@ -534,7 +534,7 @@ export const executeRemediation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const actor = await getActor(supabase, context.userId);
-    require(actor.role, "remediation.execute");
+    requirePerm(actor.role, "remediation.execute");
     const plan = check(await supabase.from("remediation_plans").select("*").eq("id", data.planId).maybeSingle(), "load plan");
     if (plan.status !== "approved") throw new Error("Only approved plans can be executed");
     const incident = check(await supabase.from("incidents").select("id, service_id, reference").eq("id", plan.incident_id).single(), "load incident");
