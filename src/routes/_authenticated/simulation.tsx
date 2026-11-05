@@ -45,7 +45,7 @@ function SimulationPage() {
   const allowed = can(me.data?.role, "simulation.run");
 
   return (
-    <AppShell title="Simulation Lab">
+    <AppShell title="Simulation Lab" subtitle="Run the full incident lifecycle on simulated infrastructure.">
       <div className="grid gap-4 p-4 md:p-6 lg:grid-cols-2">
         <Panel title="CPU spike scenario" sub={<SourceTag kind="simulated" />}>
           <p className="text-sm text-muted-foreground">Generates 30 minutes of simulated telemetry for <span className="font-mono text-foreground">checkout-svc</span> with a CPU spike. No real infrastructure is touched at any step.</p>

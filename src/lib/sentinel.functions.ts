@@ -183,9 +183,9 @@ export const getOverview = createServerFn({ method: "GET" })
     const [incidents, audits, services] = await Promise.all([
       supabase
         .from("incidents")
-        .select("id, reference, title, severity, status, source, created_at")
+        .select("id, reference, title, severity, status, source, created_at, detected_at, assignee_id, services(name)")
         .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(6),
       supabase
         .from("audit_logs")
         .select("id, agent, actor_type, message, created_at")

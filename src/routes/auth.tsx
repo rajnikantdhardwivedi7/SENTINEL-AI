@@ -97,7 +97,7 @@ function AuthPage() {
 
   return (
     <div className="grid min-h-screen place-items-center bg-grid px-4">
-      <div className="w-full max-w-sm rounded-lg border bg-surface/80 p-6 shadow-glow">
+      <div className="w-full max-w-sm rounded-lg border bg-surface p-6 shadow-glow">
         <Logo />
         <h1 className="mt-6 text-lg font-medium">{mode === "signin" ? "Sign in" : mode === "signup" ? "Create your account" : "Reset password"}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -126,7 +126,7 @@ function AuthPage() {
           {mode === "signup" && (
             <div className="space-y-1.5"><Label htmlFor="code">Invite code <span className="text-muted-foreground">(optional)</span></Label><Input id="code" value={code} onChange={(e) => setCode(e.target.value)} maxLength={20} className="font-mono uppercase" /></div>
           )}
-          {notice && <p className="rounded-md border border-primary/30 bg-primary/10 p-2 text-xs text-primary">{notice}</p>}
+          {notice && <p className="rounded-md border bg-elevated p-2 text-xs text-foreground">{notice}</p>}
           <Button type="submit" className="w-full" disabled={busy}>{busy ? "Please wait…" : mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Send reset link"}</Button>
         </form>
 
