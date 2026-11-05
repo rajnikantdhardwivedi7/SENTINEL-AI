@@ -181,7 +181,7 @@ function StatusBadge({ status }: { status: string }) {
 
 type Overview = Awaited<ReturnType<typeof getOverview>>;
 
-function PersistedPanel({ session, loading, data }: { session: boolean; loading: boolean; data?: Overview }) {
+function PersistedPanel({ session, loading, data }: { session: boolean; loading: boolean; data?: Overview | undefined }) {
   if (!session) {
     return (
       <Panel title="Your organization" sub="saved incidents">

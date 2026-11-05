@@ -49,9 +49,9 @@ function IncidentDetail() {
   const decide = useServerFn(decideRemediation);
   const execute = useServerFn(executeRemediation);
 
-  const updM = useMutation({ mutationFn: (d: Parameters<typeof update>[0]["data"]) => update({ data: d }), onSuccess: () => { toast.success("Incident updated"); refresh(); }, onError });
+  const updM = useMutation({ mutationFn: (d: { id: string; status?: "open" | "investigating" | "awaiting_approval" | "remediating" | "monitoring" | "resolved" | "closed"; severity?: "sev1" | "sev2" | "sev3" | "sev4"; assigneeId?: string | null }) => update({ data: d }), onSuccess: () => { toast.success("Incident updated"); refresh(); }, onError });
   const invM = useMutation({ mutationFn: () => investigate({ data: { incidentId } }), onSuccess: () => { toast.success("Investigation complete — approval requested"); refresh(); }, onError });
-  const decM = useMutation({ mutationFn: (d: { planId: string; decision: "approved" | "rejected"; comment?: string }) => decide({ data: d }), onSuccess: (_r, v) => { toast.success(v.decision === "approved" ? "Plan approved" : "Plan rejected"); refresh(); }, onError });
+  const decM = useMutation({ mutationFn: (d: { planId: string; decision: "approved" | "rejected"; comment?: string | undefined }) => decide({ data: d }), onSuccess: (_r, v) => { toast.success(v.decision === "approved" ? "Plan approved" : "Plan rejected"); refresh(); }, onError });
   const exeM = useMutation({ mutationFn: (planId: string) => execute({ data: { planId } }), onSuccess: (r) => { r.recovered ? toast.success("Recovery verified — incident resolved") : toast.error("Recovery not verified"); refresh(); }, onError });
 
   if (isLoading) return <AppShell title="Incident"><div className="space-y-3 p-6"><Skeleton className="h-8 w-1/2" /><Skeleton className="h-48 w-full" /><Skeleton className="h-48 w-full" /></div></AppShell>;
@@ -69,7 +69,7 @@ function IncidentDetail() {
   const evidence = inv ? data.evidence.filter((e) => e.investigation_id === inv.id) : [];
   const observed = evidence.filter((e) => e.kind === "observed");
   const hypotheses = evidence.filter((e) => e.kind === "hypothesis");
-  const memberName = (id: string | null) => { const m = data.members.find((x) => x.id === id); return m ? m.display_name || m.email : "Unknown"; };
+  const memberName = (id: string | null) => { const m = data.members.find((x) => x.id === id); return m ? m.display_name || m.email || "Unknown" : "Unknown"; };
   const done = inc.status === "resolved" || inc.status === "closed";
 
   const lifecycle = [
