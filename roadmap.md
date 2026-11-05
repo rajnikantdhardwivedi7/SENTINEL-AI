@@ -20,7 +20,9 @@
 - [x] Atomic approve/execute claims; lifecycle writes fail loudly
 - [ ] Separation of duties (approver ≠ proposer/executor) — needs product decision
 - [ ] Wrap lifecycle steps in a single DB transaction (RPC) to avoid partial states
-- [ ] Real telemetry ingestion (Prometheus/K8s) — dashboard is 100% synthetic
+- [x] Real Prometheus ingestion, REAL/DEMO switch, threshold incidents with cooldown
+- [ ] Per-service real metrics + run investigations on real snapshots
+- [ ] Kubernetes / OpenTelemetry / Grafana / Falco adapters
 - [ ] Real executor for remediation (currently simulated) and independent recovery verification
 - [ ] Audit log ordering (sequence column) and immutability review
 - [ ] Join-code rotation/expiry; invite by email
