@@ -98,11 +98,11 @@ function Dashboard() {
         <div className="grid gap-4 xl:grid-cols-2">
           <Panel title="CPU & memory utilization" sub="% across clusters">
             <ChartBox mounted={mounted}>
-              <AreaChart data={data} margin={{ top: 4, right: 4, left: -8, bottom: 0 }}>
+              <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <defs><linearGradient id="gcpu" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.22} /><stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} /></linearGradient></defs>
                 <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
                 <XAxis dataKey="t" {...axis} interval={interval} />
-                <YAxis {...axis} domain={[0, 100]} width={36} tickFormatter={(v) => `${v}%`} />
+                <YAxis {...axis} domain={[0, 100]} width={44} tickFormatter={(v) => `${v}%`} />
                 <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "var(--border)" }} />
                 <Legend iconType="plainline" wrapperStyle={legendStyle} />
                 <Area name="CPU" type="monotone" dataKey="cpu" stroke="var(--chart-1)" fill="url(#gcpu)" strokeWidth={1.5} animationDuration={400} />
@@ -112,11 +112,11 @@ function Dashboard() {
           </Panel>
           <Panel title="Request latency & error rate" sub="p95 ms · % of requests">
             <ChartBox mounted={mounted}>
-              <LineChart data={data} margin={{ top: 4, right: 0, left: -8, bottom: 0 }}>
+              <LineChart data={data} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
                 <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
                 <XAxis dataKey="t" {...axis} interval={interval} />
-                <YAxis yAxisId="l" {...axis} width={40} tickFormatter={(v) => `${v}ms`} />
-                <YAxis yAxisId="r" orientation="right" {...axis} width={36} tickFormatter={(v) => `${v}%`} />
+                <YAxis yAxisId="l" {...axis} width={56} tickFormatter={(v) => `${v}ms`} />
+                <YAxis yAxisId="r" orientation="right" {...axis} width={44} tickFormatter={(v) => `${v}%`} />
                 <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "var(--border)" }} />
                 <Legend iconType="plainline" wrapperStyle={legendStyle} />
                 <Line yAxisId="l" name="p95 latency" type="monotone" dataKey="p95" stroke="var(--chart-4)" dot={false} strokeWidth={1.5} animationDuration={400} />
@@ -234,7 +234,7 @@ function IncidentTable({ session, loading, data }: { session: boolean; loading: 
           {rows.map((r) => (
             <tr key={r.id} className="border-b last:border-0 transition-colors hover:bg-accent/40">
               <td className="whitespace-nowrap px-4 py-2 font-mono text-xs text-muted-foreground">{r.ref}</td>
-              <td className="max-w-[260px] truncate px-4 py-2">{r.link ? <Link to="/incidents/$incidentId" params={{ incidentId: r.id }} className="hover:text-primary">{r.title}</Link> : r.title}</td>
+              <td className="max-w-[240px] truncate px-4 py-2">{r.link ? <Link to="/incidents/$incidentId" params={{ incidentId: r.id }} className="hover:text-primary">{r.title}</Link> : r.title}</td>
               <td className="px-4 py-2"><SeverityBadge severity={r.severity} /></td>
               <td className="whitespace-nowrap px-4 py-2 font-mono text-xs">{r.service}</td>
               <td className="whitespace-nowrap px-4 py-2 font-mono text-xs text-muted-foreground">{r.detected}</td>
