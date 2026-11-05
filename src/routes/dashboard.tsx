@@ -19,7 +19,7 @@ export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
-const nav = [
+const _unusedNav = [
   { icon: LayoutDashboard, label: "Command Center", active: true },
   { icon: Server, label: "Infrastructure" },
   { icon: Brain, label: "Investigations" },
@@ -48,39 +48,15 @@ function Dashboard() {
   const feed: Activity[] = Array.from({ length: 8 }, (_, k) => activityAt(tick - k));
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <DemoBanner />
-      <div className="flex flex-1">
-        <aside className="hidden w-56 shrink-0 flex-col border-r bg-surface/40 p-3 lg:flex">
-          <div className="px-2 py-2"><Logo /></div>
-          <button className="mt-4 flex items-center justify-between rounded-md border px-3 py-2 text-left text-sm">
-            <span><span className="block text-xs text-muted-foreground">Workspace</span>Acme Platform</span>
-            <ChevronDown className="size-4 text-muted-foreground" />
-          </button>
-          <nav className="mt-4 space-y-0.5">
-            {nav.map((n) => (
-              <div key={n.label} className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm ${n.active ? "bg-accent text-foreground" : "text-muted-foreground"}`}>
-                <n.icon className="size-4" />{n.label}
-                {!n.active && <span className="ml-auto font-mono text-[10px] opacity-60">soon</span>}
-              </div>
-            ))}
-          </nav>
-        </aside>
-
-        <main className="min-w-0 flex-1">
-          <header className="flex h-14 items-center justify-between border-b px-4 md:px-6">
-            <div className="lg:hidden"><Logo /></div>
-            <h1 className="hidden text-sm font-medium lg:block">Command Center</h1>
-            <div className="flex items-center gap-3">
-              <span className="hidden items-center gap-1.5 font-mono text-xs text-muted-foreground sm:flex"><span className="size-1.5 rounded-full bg-success pulse-dot" />live · simulated</span>
-              <button aria-label="Notifications" className="relative rounded-md border p-2"><Bell className="size-4" /><span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-destructive text-[10px] text-destructive-foreground">3</span></button>
-            </div>
-          </header>
-
+    <AppShell
+      title="Command Center"
+      banner={<DemoBanner />}
+      actions={<span className="hidden items-center gap-1.5 font-mono text-xs text-muted-foreground sm:flex"><span className="size-1.5 rounded-full bg-success pulse-dot" />live · simulated</span>}
+    >
           <div className="space-y-4 p-4 md:p-6">
             <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-4 xl:grid-cols-6">
               <Stat label="Health score" value={`${score}`} tone={score > 80 ? "text-success" : "text-warning"} />
-              <Stat label="Active incidents" value="2" tone="text-warning" />
+              <Stat label={overview.data ? "Active incidents · saved" : "Active incidents"} value={`${overview.data?.activeIncidents ?? 2}`} tone="text-warning" />
               <Stat label="Critical alerts" value="1" tone="text-destructive" />
               <Stat label="Services" value={`${services.length}`} />
               <Stat label="CPU" value={`${now.cpu}%`} />
@@ -185,10 +161,9 @@ function Dashboard() {
                 </ul>
               </Panel>
             </div>
+            <PersistedPanel session={!!session} loading={overview.isLoading} data={overview.data} />
           </div>
-        </main>
-      </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -198,15 +173,6 @@ function Stat({ label, value, tone = "text-foreground" }: { label: string; value
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className={`mt-1 font-mono text-2xl font-medium ${tone}`}>{value}</div>
     </div>
-  );
-}
-
-function Panel({ title, sub, className = "", children }: { title: string; sub?: string; className?: string; children: React.ReactNode }) {
-  return (
-    <section className={`rounded-lg border bg-surface/40 p-4 ${className}`}>
-      <div className="mb-3 flex items-baseline justify-between"><h2 className="text-sm font-medium">{title}</h2>{sub && <span className="text-xs text-muted-foreground">{sub}</span>}</div>
-      {children}
-    </section>
   );
 }
 
