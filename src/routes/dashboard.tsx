@@ -204,7 +204,7 @@ function PersistedPanel({ session, loading, data }: { session: boolean; loading:
           </ul>
         )}
       </Panel>
-      <Panel title="Audit trail" sub={<SourceTag kind="ai" />}>
+      <Panel title="Audit trail" sub="saved">
         {!data?.activity.length ? <p className="text-sm text-muted-foreground">No activity recorded yet.</p> : (
           <ul className="space-y-2 text-xs">
             {data.activity.map((a) => (
