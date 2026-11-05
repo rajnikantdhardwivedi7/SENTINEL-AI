@@ -190,7 +190,7 @@ export function StatusPill({ status }: { status: string }) {
       ? "bg-success"
       : status === "awaiting_approval" || status === "pending_approval" || status === "warning"
         ? "bg-warning"
-        : status === "rejected" || status === "failed" || status === "degraded" || status === "open"
+        : status === "rejected" || status === "failed" || status === "disconnected" || status === "degraded" || status === "open"
           ? "bg-destructive"
           : "bg-primary";
   return <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs capitalize text-foreground/90"><span className={`size-1.5 rounded-full ${tone}`} />{status.replace(/_/g, " ")}</span>;

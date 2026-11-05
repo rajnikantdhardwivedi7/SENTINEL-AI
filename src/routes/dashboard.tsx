@@ -10,6 +10,7 @@ import { getOverview } from "@/lib/sentinel.functions";
 import { DemoBanner } from "@/components/sentinel/Logo";
 import { activityAt, clusters, demoIncidents, healthScore, metricWindow, services, type Activity, type MetricPoint } from "@/lib/demo-telemetry";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RealCommandCenter } from "@/components/sentinel/RealCommandCenter";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -39,6 +40,9 @@ function Dashboard() {
   const [mounted, setMounted] = useState(false);
   const [range, setRange] = useState<RangeKey>("30m");
   const [env, setEnv] = useState("all");
+  const [mode, setModeState] = useState<"DEMO" | "REAL">("DEMO");
+  useEffect(() => { if (localStorage.getItem("sentinel.mode") === "REAL") setModeState("REAL"); }, []);
+  const setMode = (m: "DEMO" | "REAL") => { setModeState(m); localStorage.setItem("sentinel.mode", m); };
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   useEffect(() => { setMounted(true); setUpdatedAt(new Date()); }, []);
   useEffect(() => {
@@ -68,9 +72,15 @@ function Dashboard() {
     <AppShell
       title="Command Center"
       subtitle="Infrastructure overview and operational health."
-      banner={<DemoBanner />}
+      banner={mode === "DEMO" ? <DemoBanner /> : undefined}
       actions={
         <>
+          <div role="radiogroup" aria-label="Data environment" className="flex rounded-md border bg-surface p-0.5 text-xs font-medium">
+            {(["DEMO", "REAL"] as const).map((m) => (
+              <button key={m} role="radio" aria-checked={mode === m} onClick={() => setMode(m)} className={`rounded px-2.5 py-1 font-mono transition-colors ${mode === m ? (m === "REAL" ? "bg-success/15 text-success" : "bg-warning/15 text-warning") : "text-muted-foreground hover:text-foreground"}`}>{m}</button>
+            ))}
+          </div>
+          {mode === "DEMO" && <>
           <span className="hidden items-center gap-1.5 text-xs text-muted-foreground md:flex">
             <span className="size-1.5 rounded-full bg-success pulse-dot" />Updated {updatedAt ? updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—"}
           </span>
@@ -82,9 +92,11 @@ function Dashboard() {
           <select aria-label="Time range" className={selectCls} value={range} onChange={(e) => setRange(e.target.value as RangeKey)}>
             <option value="30m">Last 30 min</option><option value="1h">Last 1 hour</option><option value="2h">Last 2 hours</option>
           </select>
+          </>}
         </>
       }
     >
+      {mode === "REAL" ? <RealCommandCenter signedIn={!!session} /> : (
       <div className="space-y-4 p-4 md:p-6">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
           <Kpi label="System health" value={`${score}`} unit="/100" delta={score - prevScore} goodWhenUp spark={data.map((p) => ({ v: healthScore(p) }))} mounted={mounted} />
@@ -171,6 +183,7 @@ function Dashboard() {
           </div>
         </Panel>
       </div>
+      )}
     </AppShell>
   );
 }
