@@ -126,11 +126,11 @@ function Dashboard() {
           </Panel>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-5">
-          <Panel title="Incidents" sub={session ? <Link to="/incidents" className="text-primary hover:underline">View all</Link> : <SourceTag kind="simulated" />} className="xl:col-span-3" flush>
+        <div className="grid gap-4 2xl:grid-cols-5">
+          <Panel title="Incidents" sub={session ? <Link to="/incidents" className="text-primary hover:underline">View all</Link> : <SourceTag kind="simulated" />} className="2xl:col-span-3" flush>
             <IncidentTable session={!!session} loading={overview.isLoading && !!session} data={overview.data} />
           </Panel>
-          <Panel title="Agent activity" sub={<SourceTag kind="simulated" />} className="xl:col-span-2" flush>
+          <Panel title="Agent activity" sub={<SourceTag kind="simulated" />} className="2xl:col-span-2" flush>
             <ul className="divide-y">
               {feed.map((a) => (
                 <li key={a.id} className="grid grid-cols-[64px_1fr] gap-3 px-4 py-2.5 transition-colors hover:bg-accent/40">
