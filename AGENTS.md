@@ -34,3 +34,4 @@ use the editor.
 - Role→permission matrix lives in `src/lib/permissions.ts` and must mirror the RLS policies; roles are in `user_roles`, never on profiles.
 - Investigation logic is pure TS in `src/lib/investigation-engine.ts` behind `InvestigationProvider`, so an LLM provider can be swapped in and tests run without I/O.
 - Every record carries `organization_id`; RLS scopes reads to `current_org()`.
+- App pages render inside `AppShell` (src/components/sentinel/AppShell.tsx), which owns sidebar nav sections, page header, and shared Panel/StatusPill/SeverityBadge/SourceTag/EmptyState primitives, so every page stays visually consistent.

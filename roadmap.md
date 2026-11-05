@@ -11,5 +11,6 @@
 - [x] Tests: permissions matrix, investigation engine
 - [ ] AI provider for investigations (Lovable AI) alongside rule engine
 - [ ] Infrastructure explorer with dependency graph
-- [ ] Security operations, remediation, analytics pages
+- [x] Premium enterprise UI redesign (palette, sidebar, Command Center, landing, all pages)
+- [ ] Security operations, remediation, analytics, audit log, infrastructure pages (sidebar shows "Soon")
 - [ ] Real telemetry ingestion
