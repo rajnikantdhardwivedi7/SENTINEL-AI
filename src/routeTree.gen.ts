@@ -18,6 +18,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSimulationRouteImport } from './routes/_authenticated/simulation'
 import { Route as AuthenticatedIncidentsIndexRouteImport } from './routes/_authenticated/incidents.index'
 import { Route as AuthenticatedIncidentsIncidentIdRouteImport } from './routes/_authenticated/incidents.$incidentId'
+import { Route as ApiPublicJobsScrapePrometheusRouteImport } from './routes/api/public/jobs/scrape-prometheus'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -65,6 +66,12 @@ const AuthenticatedIncidentsIncidentIdRoute =
     path: '/incidents/$incidentId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicJobsScrapePrometheusRoute =
+  ApiPublicJobsScrapePrometheusRouteImport.update({
+    id: '/api/public/jobs/scrape-prometheus',
+    path: '/api/public/jobs/scrape-prometheus',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/simulation': typeof AuthenticatedSimulationRoute
   '/incidents/$incidentId': typeof AuthenticatedIncidentsIncidentIdRoute
   '/incidents/': typeof AuthenticatedIncidentsIndexRoute
+  '/api/public/jobs/scrape-prometheus': typeof ApiPublicJobsScrapePrometheusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -85,6 +93,7 @@ export interface FileRoutesByTo {
   '/simulation': typeof AuthenticatedSimulationRoute
   '/incidents/$incidentId': typeof AuthenticatedIncidentsIncidentIdRoute
   '/incidents': typeof AuthenticatedIncidentsIndexRoute
+  '/api/public/jobs/scrape-prometheus': typeof ApiPublicJobsScrapePrometheusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,6 +106,7 @@ export interface FileRoutesById {
   '/_authenticated/simulation': typeof AuthenticatedSimulationRoute
   '/_authenticated/incidents/$incidentId': typeof AuthenticatedIncidentsIncidentIdRoute
   '/_authenticated/incidents/': typeof AuthenticatedIncidentsIndexRoute
+  '/api/public/jobs/scrape-prometheus': typeof ApiPublicJobsScrapePrometheusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/simulation'
     | '/incidents/$incidentId'
     | '/incidents/'
+    | '/api/public/jobs/scrape-prometheus'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/simulation'
     | '/incidents/$incidentId'
     | '/incidents'
+    | '/api/public/jobs/scrape-prometheus'
   id:
     | '__root__'
     | '/'
@@ -130,6 +142,7 @@ export interface FileRouteTypes {
     | '/_authenticated/simulation'
     | '/_authenticated/incidents/$incidentId'
     | '/_authenticated/incidents/'
+    | '/api/public/jobs/scrape-prometheus'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -138,6 +151,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicJobsScrapePrometheusRoute: typeof ApiPublicJobsScrapePrometheusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,6 +219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIncidentsIncidentIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/jobs/scrape-prometheus': {
+      id: '/api/public/jobs/scrape-prometheus'
+      path: '/api/public/jobs/scrape-prometheus'
+      fullPath: '/api/public/jobs/scrape-prometheus'
+      preLoaderRoute: typeof ApiPublicJobsScrapePrometheusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -231,6 +252,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicJobsScrapePrometheusRoute: ApiPublicJobsScrapePrometheusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
