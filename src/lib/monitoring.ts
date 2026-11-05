@@ -44,7 +44,9 @@ export function resolveQueries(q: unknown): Queries {
 }
 export function resolveThresholds(t: unknown): Thresholds {
   const r = thresholdsSchema.partial().safeParse(t ?? {});
-  return { ...DEFAULT_THRESHOLDS, ...(r.success ? r.data : {}) };
+  const out = { ...DEFAULT_THRESHOLDS };
+  if (r.success) for (const [k, v] of Object.entries(r.data)) if (typeof v === "number") out[k as keyof Thresholds] = v;
+  return out;
 }
 
 // ---------- Response validation ----------
