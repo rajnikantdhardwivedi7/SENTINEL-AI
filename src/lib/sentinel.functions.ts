@@ -66,6 +66,15 @@ async function audit(supabase: DB, actor: { userId: string; orgId: string }, row
   }
 }
 
+/** Throws if a write failed, so the lifecycle never silently continues on a partial update. */
+async function must(q: PromiseLike<{ error: { message: string } | null }>, what: string) {
+  const { error } = await q;
+  if (error) {
+    console.error(what, error);
+    throw new Error(`Failed to ${what}`);
+  }
+}
+
 // ---------- Session / profile ----------
 
 export const getMe = createServerFn({ method: "GET" })
@@ -365,7 +374,7 @@ export const runCpuSpikeSimulation = createServerFn({ method: "POST" })
     );
 
     if (!detection.detected) {
-      await supabase.from("simulation_runs").update({ status: "no_anomaly", completed_at: new Date().toISOString() }).eq("id", run.id);
+      await must(supabase.from("simulation_runs").update({ status: "no_anomaly", completed_at: new Date().toISOString() }).eq("id", run.id), "close simulation");
       return { incidentId: null, detection };
     }
 
@@ -387,8 +396,8 @@ export const runCpuSpikeSimulation = createServerFn({ method: "POST" })
         .single(),
       "create incident",
     );
-    await supabase.from("simulation_runs").update({ status: "detected", incident_id: incident.id }).eq("id", run.id);
-    await supabase.from("services").update({ status: "degraded" }).eq("id", svc.id);
+    await must(supabase.from("simulation_runs").update({ status: "detected", incident_id: incident.id }).eq("id", run.id), "link simulation");
+    await must(supabase.from("services").update({ status: "degraded" }).eq("id", svc.id), "mark service degraded");
     await audit(supabase, actor, [
       { incident_id: incident.id, actor_type: "user", action: "simulation.started", message: `Started simulated CPU spike on ${svc.name}`, details: { runId: run.id } },
       { incident_id: incident.id, actor_type: "agent", agent: "Anomaly", action: "anomaly.detected", message: `CPU ${detection.peakCpu}% exceeded threshold ${detection.threshold}% (z=${detection.zScore})`, details: detection },
@@ -427,7 +436,7 @@ export const startInvestigation = createServerFn({ method: "POST" })
         .limit(5)
     ).data ?? [];
 
-    await supabase.from("incidents").update({ status: "investigating" }).eq("id", incident.id);
+    await must(supabase.from("incidents").update({ status: "investigating" }).eq("id", incident.id), "mark incident investigating");
     const result = ruleBasedProvider.analyze({
       service: { name: svc.name, replicas: svc.replicas, currentVersion: svc.current_version, previousVersion: svc.previous_version },
       telemetry: simData.points,
@@ -486,7 +495,7 @@ export const startInvestigation = createServerFn({ method: "POST" })
         .single(),
       "save remediation plan",
     );
-    await supabase.from("incidents").update({ status: "awaiting_approval" }).eq("id", incident.id);
+    await must(supabase.from("incidents").update({ status: "awaiting_approval" }).eq("id", incident.id), "mark incident awaiting approval");
     const observed = result.evidence.filter((e) => e.kind === "observed").length;
     await audit(supabase, actor, [
       { incident_id: incident.id, actor_type: "user", action: "investigation.started", message: "Started investigation" },
@@ -519,9 +528,11 @@ export const decideRemediation = createServerFn({ method: "POST" })
       comment: data.comment || null,
       decided_by: actor.userId,
     });
-    if (ins.error) throw new Error("Failed to record decision");
-    await supabase.from("remediation_plans").update({ status: data.decision }).eq("id", plan.id);
-    if (data.decision === "rejected") await supabase.from("incidents").update({ status: "open" }).eq("id", plan.incident_id);
+    // DB trigger + unique index reject a second decision or a decision on a non-pending plan.
+    if (ins.error) throw new Error(ins.error.code === "23505" ? "This plan has already been decided" : "Failed to record decision");
+    const upd = await supabase.from("remediation_plans").update({ status: data.decision }).eq("id", plan.id).eq("status", "pending_approval").select("id");
+    if (upd.error || !upd.data?.length) throw new Error("Failed to apply decision");
+    if (data.decision === "rejected") await must(supabase.from("incidents").update({ status: "open" }).eq("id", plan.incident_id), "reopen incident");
     await audit(supabase, actor, [
       { incident_id: plan.incident_id, actor_type: "user", action: `remediation.${data.decision}`, message: `${data.decision === "approved" ? "Approved" : "Rejected"}: ${plan.title}${data.comment ? ` — “${data.comment}”` : ""}` },
     ]);
@@ -542,8 +553,10 @@ export const executeRemediation = createServerFn({ method: "POST" })
       ? (await supabase.from("services").select("*").eq("id", incident.service_id).single()).data
       : null;
 
-    await supabase.from("remediation_plans").update({ status: "executing" }).eq("id", plan.id);
-    await supabase.from("incidents").update({ status: "remediating" }).eq("id", incident.id);
+    // Atomic claim: only one caller can move approved -> executing (prevents double execution).
+    const claim = await supabase.from("remediation_plans").update({ status: "executing", executed_by: actor.userId }).eq("id", plan.id).eq("status", "approved").select("id");
+    if (claim.error || !claim.data?.length) throw new Error("This plan is already being executed");
+    await must(supabase.from("incidents").update({ status: "remediating" }).eq("id", incident.id), "mark incident remediating");
 
     const steps = (Array.isArray(plan.steps) ? plan.steps : []) as string[];
     const t0 = Date.now();
@@ -552,7 +565,7 @@ export const executeRemediation = createServerFn({ method: "POST" })
     const verifiedAt = new Date().toISOString();
     const finalStatus = recovery.recovered ? "verified" : "failed";
 
-    await supabase
+    await must(supabase
       .from("remediation_plans")
       .update({
         status: finalStatus,
@@ -562,7 +575,7 @@ export const executeRemediation = createServerFn({ method: "POST" })
         executed_at: new Date(t0).toISOString(),
         verified_at: verifiedAt,
       })
-      .eq("id", plan.id);
+      .eq("id", plan.id), "record verification");
     if (svc) {
       const svcPatch: Database["public"]["Tables"]["services"]["Update"] = { status: recovery.recovered ? "healthy" : "degraded" };
       if (plan.action === "rollback" && svc.previous_version) {
@@ -574,13 +587,13 @@ export const executeRemediation = createServerFn({ method: "POST" })
         svcPatch.replicas = target;
         svcPatch.ready_replicas = target;
       }
-      await supabase.from("services").update(svcPatch).eq("id", svc.id);
+      await must(supabase.from("services").update(svcPatch).eq("id", svc.id), "update service");
     }
-    await supabase
+    await must(supabase
       .from("incidents")
       .update(recovery.recovered ? { status: "resolved", resolved_at: verifiedAt } : { status: "open" })
-      .eq("id", incident.id);
-    await supabase.from("simulation_runs").update({ status: "completed", completed_at: verifiedAt }).eq("incident_id", incident.id);
+      .eq("id", incident.id), "update incident outcome");
+    await must(supabase.from("simulation_runs").update({ status: "completed", completed_at: verifiedAt }).eq("incident_id", incident.id), "close simulation");
 
     await audit(supabase, actor, [
       { incident_id: incident.id, actor_type: "user", action: "remediation.executed", message: `Executed: ${plan.title} (simulated)`, details: { log } },

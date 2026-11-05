@@ -14,3 +14,14 @@
 - [x] Premium enterprise UI redesign (palette, sidebar, Command Center, landing, all pages)
 - [ ] Security operations, remediation, analytics, audit log, infrastructure pages (sidebar shows "Soon")
 - [ ] Real telemetry ingestion
+
+## Principal-engineer review follow-ups
+- [x] DB-enforced remediation state machine, single approval per plan, attributed audit rows
+- [x] Atomic approve/execute claims; lifecycle writes fail loudly
+- [ ] Separation of duties (approver ≠ proposer/executor) — needs product decision
+- [ ] Wrap lifecycle steps in a single DB transaction (RPC) to avoid partial states
+- [ ] Real telemetry ingestion (Prometheus/K8s) — dashboard is 100% synthetic
+- [ ] Real executor for remediation (currently simulated) and independent recovery verification
+- [ ] Audit log ordering (sequence column) and immutability review
+- [ ] Join-code rotation/expiry; invite by email
+- [ ] Rate limiting on simulation/investigation endpoints

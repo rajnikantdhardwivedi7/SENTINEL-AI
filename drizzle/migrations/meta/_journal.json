@@ -8,6 +8,13 @@
       "when": 1793908051838,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793909655639,
+      "tag": "0001_harden_remediation_workflow",
+      "breakpoints": true
     }
   ]
 }
