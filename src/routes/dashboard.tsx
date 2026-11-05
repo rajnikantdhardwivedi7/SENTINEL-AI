@@ -236,7 +236,7 @@ function IncidentTable({ session, loading, data }: { session: boolean; loading: 
               <td className="whitespace-nowrap px-4 py-2 font-mono text-xs text-muted-foreground">{r.ref}</td>
               <td className="max-w-[260px] truncate px-4 py-2">{r.link ? <Link to="/incidents/$incidentId" params={{ incidentId: r.id }} className="hover:text-primary">{r.title}</Link> : r.title}</td>
               <td className="px-4 py-2"><SeverityBadge severity={r.severity} /></td>
-              <td className="px-4 py-2 font-mono text-xs">{r.service}</td>
+              <td className="whitespace-nowrap px-4 py-2 font-mono text-xs">{r.service}</td>
               <td className="whitespace-nowrap px-4 py-2 font-mono text-xs text-muted-foreground">{r.detected}</td>
               <td className="px-4 py-2"><StatusPill status={r.status} /></td>
               <td className="whitespace-nowrap px-4 py-2 text-xs text-muted-foreground">{r.agent}</td>
