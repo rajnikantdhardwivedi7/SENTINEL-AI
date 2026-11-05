@@ -30,12 +30,12 @@ function requirePerm(role: Role, permission: Permission) {
   if (!can(role, permission)) throw new Error(`Forbidden: your role cannot perform ${permission}`);
 }
 
-function check<T>(res: { data: T | null; error: { message: string } | null }, what: string): NonNullable<T> {
+function check<R extends { data: unknown; error: { message: string } | null }>(res: R, what: string): NonNullable<R["data"]> {
   if (res.error || res.data === null) {
     console.error(what, res.error);
     throw new Error(`Failed to ${what}`);
   }
-  return res.data as NonNullable<T>;
+  return res.data as NonNullable<R["data"]>;
 }
 
 type AuditRow = {
