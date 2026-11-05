@@ -12,7 +12,7 @@ Monitor infrastructure, investigate incidents and coordinate governed remediatio
   <img alt="TanStack Start" src="https://img.shields.io/badge/TanStack%20Start-v1-1f2937?style=flat-square">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript&logoColor=white">
   <img alt="Tailwind CSS 4" src="https://img.shields.io/badge/Tailwind%20CSS-4-0f172a?style=flat-square&logo=tailwindcss">
-  <img alt="Supabase" src="https://img.shields.io/badge/Postgres-Supabase%20%2F%20Lovable%20Cloud-1f2937?style=flat-square&logo=supabase">
+  <img alt="Supabase" src="https://img.shields.io/badge/Postgres-Supabase%20%2F%20-1f2937?style=flat-square&logo=supabase">
   <img alt="Vitest" src="https://img.shields.io/badge/tests-Vitest-6e9f18?style=flat-square&logo=vitest&logoColor=white">
 </p>
 
