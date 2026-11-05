@@ -65,7 +65,7 @@ function Landing() {
         <div className="absolute inset-0 bg-grid [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
         <div className="relative mx-auto max-w-6xl px-6 pt-20 text-center md:pt-28">
           <p className="text-[13px] font-medium tracking-wide text-muted-foreground">SENTINEL AI</p>
-          <h1 className="mx-auto mt-4 max-w-3xl text-[40px] font-semibold leading-[1.08] tracking-tight md:text-[56px]">
+          <h1 className="mx-auto mt-4 max-w-4xl text-[38px] font-semibold leading-[1.08] tracking-tight md:text-[52px]">
             Infrastructure intelligence.
             <span className="block text-muted-foreground">Built for operational resilience.</span>
           </h1>
