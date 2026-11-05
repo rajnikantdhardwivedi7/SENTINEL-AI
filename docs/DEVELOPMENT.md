@@ -6,7 +6,7 @@ Status log, verification notes and limitations. See also [ARCHITECTURE.md](ARCHI
 
 ```bash
 npm install        # or: bun install
-npm run dev        # http://localhost:8080
+npm run dev        # prints the local URL
 npm run build
 npm test           # vitest run
 npm run lint
