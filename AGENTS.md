@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Server logic lives in `src/lib/sentinel.functions.ts` (createServerFn + requireSupabaseAuth, zod-validated); it uses the caller's RLS client so DB policies are the final permission check.
+- Role→permission matrix lives in `src/lib/permissions.ts` and must mirror the RLS policies; roles are in `user_roles`, never on profiles.
+- Investigation logic is pure TS in `src/lib/investigation-engine.ts` behind `InvestigationProvider`, so an LLM provider can be swapped in and tests run without I/O.
+- Every record carries `organization_id`; RLS scopes reads to `current_org()`.
