@@ -15,6 +15,20 @@
       "when": 1793909655639,
       "tag": "0001_harden_remediation_workflow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793909977195,
+      "tag": "0002_prometheus_monitoring",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793910441652,
+      "tag": "0003_lock_monitoring_credentials",
+      "breakpoints": true
     }
   ]
 }

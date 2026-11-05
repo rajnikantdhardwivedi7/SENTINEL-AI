@@ -19,7 +19,9 @@ export type Permission =
   | "remediation.approve"
   | "remediation.execute"
   | "workspace.manage"
-  | "members.manage";
+  | "members.manage"
+  | "monitoring.manage"
+  | "monitoring.scrape";
 
 const MATRIX: Record<Role, readonly Permission[]> = {
   admin: [
@@ -31,6 +33,8 @@ const MATRIX: Record<Role, readonly Permission[]> = {
     "remediation.execute",
     "workspace.manage",
     "members.manage",
+    "monitoring.manage",
+    "monitoring.scrape",
   ],
   sre: [
     "incident.view",
@@ -39,6 +43,7 @@ const MATRIX: Record<Role, readonly Permission[]> = {
     "simulation.run",
     "remediation.approve",
     "remediation.execute",
+    "monitoring.scrape",
   ],
   security_analyst: ["incident.view", "incident.update", "investigation.run"],
   viewer: ["incident.view"],

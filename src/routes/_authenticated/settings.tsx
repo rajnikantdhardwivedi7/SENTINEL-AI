@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MonitoringSettings } from "@/components/sentinel/MonitoringSettings";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -113,6 +114,7 @@ function SettingsPage() {
             </ul>
           )}
         </Panel>
+        <MonitoringSettings canManage={can(role, "monitoring.manage")} canScrape={can(role, "monitoring.scrape")} />
       </div>
     </AppShell>
   );

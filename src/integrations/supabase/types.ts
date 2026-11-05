@@ -14,6 +14,64 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_states: {
+        Row: {
+          connection_id: string
+          fingerprint: string
+          id: string
+          incident_id: string | null
+          last_fired_at: string
+          last_value: number | null
+          organization_id: string
+          rule: string
+          suppressed_count: number
+        }
+        Insert: {
+          connection_id: string
+          fingerprint: string
+          id?: string
+          incident_id?: string | null
+          last_fired_at?: string
+          last_value?: number | null
+          organization_id: string
+          rule: string
+          suppressed_count?: number
+        }
+        Update: {
+          connection_id?: string
+          fingerprint?: string
+          id?: string
+          incident_id?: string | null
+          last_fired_at?: string
+          last_value?: number | null
+          organization_id?: string
+          rule?: string
+          suppressed_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_states_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "monitoring_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_states_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_states_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -366,6 +424,164 @@ export type Database = {
           },
           {
             foreignKeyName: "investigations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metric_snapshots: {
+        Row: {
+          captured_at: string
+          connection_id: string
+          errors: Json
+          id: string
+          metrics: Json
+          ok: boolean
+          organization_id: string
+          source: string
+          targets: Json
+        }
+        Insert: {
+          captured_at?: string
+          connection_id: string
+          errors?: Json
+          id?: string
+          metrics?: Json
+          ok: boolean
+          organization_id: string
+          source?: string
+          targets?: Json
+        }
+        Update: {
+          captured_at?: string
+          connection_id?: string
+          errors?: Json
+          id?: string
+          metrics?: Json
+          ok?: boolean
+          organization_id?: string
+          source?: string
+          targets?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metric_snapshots_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "monitoring_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metric_snapshots_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      monitoring_connections: {
+        Row: {
+          auth_type: string
+          base_url: string
+          cooldown_minutes: number
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          has_credential: boolean
+          id: string
+          kind: string
+          last_checked_at: string | null
+          last_error: string | null
+          last_success_at: string | null
+          name: string
+          organization_id: string
+          queries: Json
+          status: string
+          thresholds: Json
+          updated_at: string
+        }
+        Insert: {
+          auth_type?: string
+          base_url: string
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          has_credential?: boolean
+          id?: string
+          kind?: string
+          last_checked_at?: string | null
+          last_error?: string | null
+          last_success_at?: string | null
+          name?: string
+          organization_id: string
+          queries?: Json
+          status?: string
+          thresholds?: Json
+          updated_at?: string
+        }
+        Update: {
+          auth_type?: string
+          base_url?: string
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          has_credential?: boolean
+          id?: string
+          kind?: string
+          last_checked_at?: string | null
+          last_error?: string | null
+          last_success_at?: string | null
+          name?: string
+          organization_id?: string
+          queries?: Json
+          status?: string
+          thresholds?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_connections_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      monitoring_credentials: {
+        Row: {
+          connection_id: string
+          organization_id: string
+          secret: string
+          updated_at: string
+        }
+        Insert: {
+          connection_id: string
+          organization_id: string
+          secret: string
+          updated_at?: string
+        }
+        Update: {
+          connection_id?: string
+          organization_id?: string
+          secret?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_credentials_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "monitoring_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "monitoring_credentials_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"

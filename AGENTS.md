@@ -36,3 +36,4 @@ use the editor.
 - Every record carries `organization_id`; RLS scopes reads to `current_org()`.
 - App pages render inside `AppShell` (src/components/sentinel/AppShell.tsx), which owns sidebar nav sections, page header, and shared Panel/StatusPill/SeverityBadge/SourceTag/EmptyState primitives, so every page stays visually consistent.
 - Remediation plan state transitions and approval preconditions are enforced by DB triggers (mirrored in `src/lib/remediation-state.ts`); server code uses conditional updates to claim transitions, because RLS alone let operators skip approval via the API.
+- Monitoring: pure rules/parsing in `src/lib/monitoring.ts`, server-only Prometheus I/O in `src/lib/prometheus.server.ts`; credentials live in `monitoring_credentials` (service-role only) and monitoring writes go through the admin client after a role check, because cron has no user session. REAL mode never falls back to simulated data.
